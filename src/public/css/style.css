@@ -1,0 +1,25 @@
+.center-container {
+    height: 100vh;
+    position: relative;     
+}
+
+.centered-content {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+}
+
+span.labeled-control {
+   display: block;
+   padding: 6px;
+}
+
+input[type="button"] {
+   vertical-align: center;
+}
+
+.labeled-control label {
+   width: 5em;
+   display: block;
+}
