@@ -1,6 +1,6 @@
 {
     "compilerOptions": {
-        "outDir": ".built",
+        "outDir": ".dist",
         "allowJs": true,
         "sourceMap": true,
         "target": "es5"
