@@ -19,7 +19,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "npm run build-ts && npm run copy-static-assets",
     "build-ts": "tsc",
-    "copy-static-assets": "ts-node copyStaticAssets.ts"
+    "copy-static-assets": "ts-node copyStaticAssets.ts",
+    "serve": "node ./.dist/app.js"
   },
   "author": "",
   "license": "ISC"
