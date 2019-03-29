@@ -6,13 +6,30 @@ import bcrypt from "bcrypt";
 const app: express.Application = express();
 
 const port = 3000;
+const deployedURI: string = "mongodb+srv://MarcelB:<password>@unchangedfool-vc9qi.mongodb.net/DataTurtle?retryWrites=true";
+const localURI: string = "mongodb://127.0.0.1:27017/DataTurtle"
 
-mongoose.connect(" mongodb://127.0.0.1:27017/DataTurtle", {useNewUrlParser: true} );
+let DEVMODE: boolean = false;
+
+console.log("MODES: ");
+process.argv.forEach((val) => {
+    if (val === "--dev") {
+        DEVMODE = true;
+    }
+    console.log(val);
+});
+
+if (DEVMODE) {
+    mongoose.connect(localURI, {useNewUrlParser: true} );
+} else {
+    mongoose.connect(deployedURI, {useNewUrlParser: true} );
+}
+
 
 const db: mongoose.Connection = mongoose.connection;
 
 db.on("error", (e) => {
-    console.log("Error on connection!")
+    console.log("Error on connection!\n" + e);
 });
 
 let userSchema: mongoose.Schema = new mongoose.Schema({

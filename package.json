@@ -24,9 +24,10 @@
     "build": "npm run build-ts && npm run copy-static-assets",
     "build-ts": "tsc",
     "copy-static-assets": "ts-node copyStaticAssets.ts",
-    "serve": "node ./.dist/app.js",
+    "serve": "node ./.dist/app.js --dev",
+    "serve-deployed": "node ./.dist/app.js",
     "update": "npm run build && npm run serve",
-    "start": "npm run server"
+    "start": "npm run serve-deployed"
   },
   "author": "",
   "license": "ISC"
