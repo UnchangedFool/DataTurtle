@@ -8,7 +8,7 @@ const app: express.Application = express();
 const port = 3000;
 const portDeployed = process.env.PORT;
 
-const deployedURI: string = "mongodb+srv://MarcelB:MONGOm365bern@unchangedfool-vc9qi.mongodb.net/DataTurtle?retryWrites=true";
+const deployedURI: string = "mongodb+srv://MarcelB:BROOMattack@unchangedfool-vc9qi.mongodb.net/DataTurtle?retryWrites=true";
 const localURI: string = "mongodb://127.0.0.1:27017/DataTurtle"
 
 let DEVMODE: boolean = false;
