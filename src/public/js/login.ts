@@ -8,7 +8,7 @@ $(document).ready(() => {
                 username: username,
                 password: password
             },
-            url: "login/send",
+            url: "login",
             dataType: "json"
         }).done((data) => {
             $("#message").text(data.msg);
@@ -24,7 +24,7 @@ $(document).ready(() => {
                 username: username,
                 password: password
             },
-            url: "login/new",
+            url: "signup",
             dataType: "json"
         }).done((data) => {
             $("#message").text(data.msg);

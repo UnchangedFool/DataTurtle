@@ -2,6 +2,9 @@ import express from "express";
 import path from "path";
 import mongoose from "mongoose";
 import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
+import * as user from "./models/user";
+import { RepoFindResult, RepoCreateResult } from "./models/types";
 
 const app: express.Application = express();
 
@@ -34,63 +37,35 @@ db.on("error", (e) => {
     console.log("Error on connection!\n" + e);
 });
 
-let userSchema: mongoose.Schema = new mongoose.Schema({
-    username: String,
-    password: String
-});
-
-const User = mongoose.model("User", userSchema);
-
 db.once("open", (e) => {
     console.log("Sucessfully connected");
-    userSchema 
 });
-
-
 
 app.use(express.static(".dist/public"));
 app.get("/", ( req, res) => {
     res.sendFile(path.join(__dirname + "/../views/login.html"));
 });
 
-app.get("/login/send", (req, res) => {
+app.get("/login", (req, res) => {
     let username: string = req.query.username;
     let password: string = req.query.password;
-    
-    console.log(password);
-    
-    res.setHeader("Content-Type", "application/json");
-    res.end(JSON.stringify( { msg: "Erfolgreich! " + username }));
+
+    let userRepo = new user.UserRepository();
+
+    userRepo.findByName(username, (repoRes: RepoFindResult<user.IUser>) => {
+        res.setHeader("Content-Type", "application/json");
+        res.end(JSON.stringify( { msg: repoRes.msg + "\nUN: " + repoRes.value.username + "PW: " + repoRes.value.password})); 
+    });
 });
 
-app.get("/login/new", (req, res) => {
-    let username: string = req.query.username;
-    let password: string = req.query.password;
+app.get("/signup", (req, res) => {
+    let userItem = new user.User(req.query.username, req.query.password);
+    let userRepo = new user.UserRepository();
 
-    User.count({ username: username}, (err, count) => {
+     userRepo.create(userItem, (repoRes: RepoCreateResult<user.IUser>) => {
         res.setHeader("Content-Type", "application/json");
-
-        if (count > 0) {
-            res.end(JSON.stringify( { msg: "Benutzer besteht bereits!" }));
-        } else {
-            bcrypt.hash(password, 10, (err, hash) => {
-                let newUser = new User({ username: username, password: hash });
-
-                newUser.save((err, user) => {
-                    if (err) {
-                        console.log(err);
-                        res.end(JSON.stringify( { msg: "Beim erstellen des Benutzers kam es zu einem Fehler!" }));
-
-                        return;
-                    }
-
-                    res.end(JSON.stringify( { msg: "Benutzer wurde angelegt!" }));
-                });
-            }); 
-        }
-    });
-
-       
+        res.end(JSON.stringify( { msg: repoRes.msg })); 
+     });          
 });
 
 app.listen(DEVMODE ? port : portDeployed, () => console.log("Example app listening on port ${port}!", port));
