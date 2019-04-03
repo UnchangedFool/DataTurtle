@@ -59,7 +59,6 @@ export class UserRepository {
                 }); 
             } else {
                 const repo = this;
-
                 repo.model.findOne({ username: username}, (err, res) => {
                     if (res === null) { 
                         reject(<RepoFindResult<IUser>> { 
@@ -96,7 +95,7 @@ export class UserRepository {
                         if (count === 0) {
                             reject(<RepoFindResult<boolean>> { 
                                 value: false, 
-                                msg: `Benutzer exestiert!`
+                                msg: `Benutzer konnte nicht gefunden werden!`
                             });
                         } else {
                             resolve(<RepoFindResult<boolean>> { 
@@ -119,14 +118,13 @@ export class UserRepository {
                 });            
             } else {
                 const repo = this;
-
                 repo.existsByName(user.username).then(() => {
                     reject(<RepoCreateResult<IUser>> { 
                         value: User.empty(), 
                         msg: "Benutzer ist bereits vergeben!" 
                     });                  
                 }).catch(() => {
-                    let result = <RepoCreateResult<IUser>> { 
+                    let result = <RepoCreateResult<IUser>> {
                         value: user, 
                         msg: "Default" 
                     };
@@ -142,6 +140,43 @@ export class UserRepository {
                             resolve(result);
                         }                            
                     });
+                });
+            }
+        });
+    }
+
+    validateLogin(username: string, password: string): Promise<RepoFindResult<IUser>> {
+        return new Promise<RepoFindResult<IUser>>((resolve, reject) => {
+            if (username.trim().length === 0 || password.trim().length === 0) {
+                reject(<RepoFindResult<IUser>> { 
+                    value: User.empty(), 
+                    msg: "Unvollständige Login-Daten!" 
+                });
+            } else {
+                const repo = this;
+                repo.findByName(username).then((res: RepoFindResult<IUser>) => {
+                    bcrypt.compare(password, res.value.password, (err, same) => {
+                        if (err) {
+                            reject(<RepoFindResult<IUser>> { 
+                                value: new User(), 
+                                msg: `MongoDB - ${err}! `
+                            });
+                        } else {
+                            if (same) {
+                                resolve(<RepoFindResult<IUser>> { 
+                                    value: res.value, 
+                                    msg: `Login erfolgreich!`
+                                });
+                            } else {
+                                reject(<RepoFindResult<IUser>> { 
+                                    value: new User(), 
+                                    msg: `Konnte nicht angemeldet werden. Fehlerhafte Anmeldedaten!`
+                                });
+                            }
+                        }
+                    });
+                }).catch((res: RepoFindResult<IUser>) => {
+                    reject(res);
                 });
             }
         });

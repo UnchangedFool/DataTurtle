@@ -10,8 +10,8 @@ const app: express.Application = express();
 const port = 3000;
 const portDeployed = process.env.PORT;
 
-const deployedURI: string = "mongodb+srv://XXXXXXXXXXX@unchangedfool-vc9qi.mongodb.net/DataTurtle?retryWrites=true";
-const localURI: string = "mongodb://127.0.0.1:27017/DataTurtle"
+const deployedURI: string = process.env.MongoDBConn;
+const localURI: string = "mongodb://127.0.0.1:27017/DataTurtle";
 
 let DEVMODE: boolean = false;
 
@@ -28,7 +28,6 @@ if (DEVMODE) {
 } else {
     mongoose.connect(deployedURI, {useNewUrlParser: true} );
 }
-
 
 const db: mongoose.Connection = mongoose.connection;
 
@@ -51,7 +50,7 @@ app.get("/login", (req, res) => {
 
     let userRepo = new user.UserRepository();
 
-    userRepo.findByName(username).then((repoRes: RepoFindResult<user.IUser>) => {
+    userRepo.validateLogin(username, password).then((repoRes: RepoFindResult<user.IUser>) => {
         res.setHeader("Content-Type", "application/json");
         res.end(JSON.stringify( { msg: `${repoRes.msg}\nUN: ${repoRes.value.username} PW: ${repoRes.value.password}`} )); 
     }).catch((repoRes: RepoFindResult<user.IUser>) => {
