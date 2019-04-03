@@ -1,7 +1,6 @@
 import express from "express";
 import path from "path";
 import mongoose from "mongoose";
-import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import * as user from "./models/user";
 import { RepoFindResult, RepoCreateResult } from "./models/types";
@@ -11,7 +10,7 @@ const app: express.Application = express();
 const port = 3000;
 const portDeployed = process.env.PORT;
 
-const deployedURI: string = "mongodb+srv://MarcelB:BROOMattack@unchangedfool-vc9qi.mongodb.net/DataTurtle?retryWrites=true";
+const deployedURI: string = "mongodb+srv://XXXXXXXXXXX@unchangedfool-vc9qi.mongodb.net/DataTurtle?retryWrites=true";
 const localURI: string = "mongodb://127.0.0.1:27017/DataTurtle"
 
 let DEVMODE: boolean = false;
@@ -52,9 +51,12 @@ app.get("/login", (req, res) => {
 
     let userRepo = new user.UserRepository();
 
-    userRepo.findByName(username, (repoRes: RepoFindResult<user.IUser>) => {
+    userRepo.findByName(username).then((repoRes: RepoFindResult<user.IUser>) => {
         res.setHeader("Content-Type", "application/json");
-        res.end(JSON.stringify( { msg: repoRes.msg + "\nUN: " + repoRes.value.username + "PW: " + repoRes.value.password})); 
+        res.end(JSON.stringify( { msg: `${repoRes.msg}\nUN: ${repoRes.value.username} PW: ${repoRes.value.password}`} )); 
+    }).catch((repoRes: RepoFindResult<user.IUser>) => {
+        res.setHeader("Content-Type", "application/json");
+        res.end(JSON.stringify( { msg: `Error: ${repoRes.msg}`})); 
     });
 });
 
@@ -62,9 +64,12 @@ app.get("/signup", (req, res) => {
     let userItem = new user.User(req.query.username, req.query.password);
     let userRepo = new user.UserRepository();
 
-     userRepo.create(userItem, (repoRes: RepoCreateResult<user.IUser>) => {
+     userRepo.create(userItem).then((repoRes: RepoCreateResult<user.IUser>) => {
         res.setHeader("Content-Type", "application/json");
         res.end(JSON.stringify( { msg: repoRes.msg })); 
+     }).catch((repoRes: RepoCreateResult<user.IUser>) => {
+        res.setHeader("Content-Type", "application/json");
+        res.end(JSON.stringify( { msg: `Error: ${repoRes.msg}` })); 
      });          
 });
 
